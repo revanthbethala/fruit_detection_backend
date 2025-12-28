@@ -1,0 +1,302 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Fruit & Vegetable Classifier</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f8;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      .card {
+        background: white;
+        padding: 20px 25px;
+        border-radius: 10px;
+        width: 350px;
+        text-align: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      img {
+        max-width: 100%;
+        margin-top: 10px;
+        border-radius: 6px;
+      }
+      button {
+        margin-top: 15px;
+        padding: 10px 15px;
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      button:disabled {
+        background: #9ca3af;
+      }
+      .result {
+        margin-top: 15px;
+        font-size: 16px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h2>Fruit & Vegetable Classifier</h2>
+
+      <input type="file" id="fileInput" accept="image/*" />
+      <img id="preview" style="display: none" />
+
+      <button id="predictBtn" disabled>Predict</button>
+
+      <div class="result" id="result"></div>
+    </div>
+
+    <script>
+      const fileInput = document.getElementById("fileInput");
+      const preview = document.getElementById("preview");
+      const predictBtn = document.getElementById("predictBtn");
+      const resultDiv = document.getElementById("result");
+
+      let selectedFile = null;
+
+      // Preview image
+      fileInput.addEventListener("change", () => {
+        selectedFile = fileInput.files[0];
+        if (!selectedFile) return;
+
+        preview.src = URL.createObjectURL(selectedFile);
+        preview.style.display = "block";
+        predictBtn.disabled = false;
+        resultDiv.innerHTML = "";
+      });
+
+      // Send image to backend
+      predictBtn.addEventListener("click", async () => {
+        if (!selectedFile) return;
+
+        predictBtn.disabled = true;
+        resultDiv.innerHTML = "Predicting...";
+
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+
+        try {
+          const response = await fetch("http://localhost:5000/predict", {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await response.json();
+
+          if (data.error) {
+            resultDiv.innerHTML = "Error: " + data.error;
+          } else {
+            resultDiv.innerHTML = `
+            ${data.name}<br>
+            Confidence: ${(data.confidence * 100).toFixed(2)}%
+          `;
+          }
+        } catch (err) {
+          resultDiv.innerHTML = "Server error. Is backend running?";
+        }
+
+        predictBtn.disabled = false;
+      });
+    </script>
+  </body>
+</html> -->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Fruit & Vegetable Classifier</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f8;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+      .card {
+        background: white;
+        padding: 20px 25px;
+        border-radius: 10px;
+        width: 380px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      h2 {
+        text-align: center;
+        margin-bottom: 10px;
+      }
+      img {
+        max-width: 100%;
+        margin-top: 10px;
+        border-radius: 6px;
+      }
+      button {
+        margin-top: 15px;
+        width: 100%;
+        padding: 10px;
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 15px;
+      }
+      button:disabled {
+        background: #9ca3af;
+      }
+      .section {
+        margin-top: 15px;
+        font-size: 14px;
+      }
+      .section h4 {
+        margin-bottom: 5px;
+        color: #2563eb;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      table td {
+        padding: 4px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .badge {
+        display: inline-block;
+        background: #e5e7eb;
+        padding: 3px 6px;
+        border-radius: 4px;
+        margin: 2px 2px 0 0;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="card">
+      <h2>Fruit & Vegetable Classifier</h2>
+
+      <input type="file" id="fileInput" accept="image/*" />
+      <img id="preview" style="display: none" />
+
+      <button id="predictBtn" disabled>Predict</button>
+
+      <div id="output"></div>
+    </div>
+
+    <script>
+      const fileInput = document.getElementById("fileInput");
+      const preview = document.getElementById("preview");
+      const predictBtn = document.getElementById("predictBtn");
+      const output = document.getElementById("output");
+
+      let selectedFile = null;
+
+      fileInput.addEventListener("change", () => {
+        selectedFile = fileInput.files[0];
+        if (!selectedFile) return;
+
+        preview.src = URL.createObjectURL(selectedFile);
+        preview.style.display = "block";
+        predictBtn.disabled = false;
+        output.innerHTML = "";
+      });
+
+      predictBtn.addEventListener("click", async () => {
+        if (!selectedFile) return;
+
+        predictBtn.disabled = true;
+        output.innerHTML = "<p>Predicting...</p>";
+
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+
+        try {
+          const response = await fetch("http://localhost:5000/predict", {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await response.json();
+
+          if (data.error) {
+            output.innerHTML = `<p style="color:red">${data.error}</p>`;
+            predictBtn.disabled = false;
+            return;
+          }
+
+          const { prediction, nutrition, health_guidance } = data;
+
+          output.innerHTML = `
+            <div class="section">
+              <h4>Prediction</h4>
+              <b>${prediction.name}</b><br />
+              Confidence: ${(prediction.confidence * 100).toFixed(2)}%
+            </div>
+
+            <div class="section">
+              <h4>Nutrition (per 100g)</h4>
+              <table>
+                ${Object.entries(nutrition)
+                  .filter(([k]) => k !== "Item")
+                  .map(
+                    ([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`
+                  )
+                  .join("")}
+              </table>
+            </div>
+
+            <div class="section">
+              <h4>Best For</h4>
+              ${health_guidance.best_for
+                .map((i) => `<span class="badge">${i}</span>`)
+                .join("")}
+            </div>
+
+            <div class="section">
+              <h4>Avoid If</h4>
+              ${health_guidance.avoid_if.length
+                ? health_guidance.avoid_if
+                    .map((i) => `<span class="badge">${i}</span>`)
+                    .join("")
+                : "<span class='badge'>None</span>"}
+            </div>
+
+            <div class="section">
+              <h4>Season</h4>
+              ${health_guidance.season
+                .map((i) => `<span class="badge">${i}</span>`)
+                .join("")}
+            </div>
+
+            <div class="section">
+              <h4>Health Benefits</h4>
+              <ul>
+                ${health_guidance.health_benefits
+                  .map((b) => `<li>${b}</li>`)
+                  .join("")}
+              </ul>
+            </div>
+          `;
+        } catch (err) {
+          output.innerHTML = "<p style='color:red'>Backend not reachable</p>";
+        }
+
+        predictBtn.disabled = false;
+      });
+    </script>
+  </body>
+</html>
